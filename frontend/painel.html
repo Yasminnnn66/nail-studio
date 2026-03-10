@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel — Nail Studio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose: #b37f78; --rose-light: #f7ebe8; --rose-dark: #bb9d99;
+  --cream: #FDFAF8; --nude: #F5EDE8; --brown: #b68c7b;
+  --brown-mid: #5a3b2d; --muted: #B09890; --green: #5A9E7C;
+  --border: #EAD9D3; --white: #FFFFFF;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--cream); color:var(--brown); min-height:100vh; }
+
+/* LOGIN */
+.tela-login {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--nude) 0%, var(--cream) 100%);
+}
+.login-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 24px; padding: 40px 32px;
+  width: 100%; max-width: 360px;
+  box-shadow: 0 20px 60px rgba(44,31,26,0.08);
+  text-align: center;
+}
+.login-icon { font-size: 48px; margin-bottom: 16px; }
+.login-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 700; color: var(--brown);
+  margin-bottom: 6px;
+}
+.login-sub { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+.login-field { margin-bottom: 12px; text-align: left; }
+.login-field label {
+  display: block; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: var(--brown-mid); margin-bottom: 6px;
+}
+.login-field input {
+  width: 100%; padding: 14px 16px;
+  border: 2px solid var(--border); border-radius: 12px;
+  font-family: 'DM Sans', sans-serif; font-size: 15px;
+  color: var(--brown); outline: none; transition: border-color 0.2s;
+  background: var(--cream);
+}
+.login-field input:focus { border-color: var(--rose); background: var(--white); }
+.btn-entrar {
+  width: 100%; padding: 15px; background: var(--rose); color: white;
+  border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s; margin-top: 4px;
+}
+.btn-entrar:hover { background: var(--rose-dark); }
+.erro-senha {
+  display: none; margin-top: 10px;
+  background: #fee2e2; color: #dc2626;
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 13px; font-weight: 500;
+}
+
+/* HEADER */
+.header {
+  background:var(--brown); padding:18px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.logo { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:700; color:white; }
+.logo span { color:var(--rose-light); }
+.header-right { display:flex; align-items:center; gap:16px; }
+.header-tag { font-size:12px; color:rgba(255,255,255,0.4); letter-spacing:1px; text-transform:uppercase; }
+.btn-sair {
+  font-size:12px; color:rgba(255,255,255,0.5); background:none;
+  border:1px solid rgba(255,255,255,0.15); border-radius:8px;
+  padding:6px 12px; cursor:pointer; font-family:'DM Sans',sans-serif;
+  transition:all 0.2s;
+}
+.btn-sair:hover { color:white; border-color:rgba(255,255,255,0.4); }
+
+.container { max-width:680px; margin:0 auto; padding:28px 20px 60px; }
+
+/* DATE NAV */
+.date-nav {
+  background:var(--white); border:1px solid var(--border);
+  border-radius:16px; padding:18px 20px; margin-bottom:20px;
+  display:flex; align-items:center; gap:12px;
+}
+.date-nav-btn {
+  width:36px; height:36px; border-radius:10px; background:var(--nude);
+  border:none; cursor:pointer; font-size:16px; color:var(--brown-mid);
+  display:flex; align-items:center; justify-content:center;
+  transition:background 0.2s; flex-shrink:0;
+}
+.date-nav-btn:hover { background:var(--border); }
+.date-label {
+  flex:1; text-align:center;
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px; font-weight:700;
+}
+.date-input {
+  border:1.5px solid var(--border); border-radius:10px;
+  padding:8px 12px; font-family:'DM Sans',sans-serif;
+  font-size:13px; color:var(--brown); background:var(--nude);
+  outline:none; cursor:pointer;
+}
+.date-input:focus { border-color:var(--rose); }
+
+/* STATS */
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:20px; }
+.stat-card {
+  background:var(--white); border:1px solid var(--border);
+  border-radius:14px; padding:16px; text-align:center;
+}
+.stat-num { font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:700; color:var(--brown); }
+.stat-label { font-size:12px; color:var(--muted); margin-top:2px; }
+.stat-card.highlight { background:var(--rose-light); border-color:rgba(212,132,122,0.3); }
+.stat-card.highlight .stat-num { color:var(--rose-dark); }
+
+/* LIST */
+.list-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:12px;
+}
+.list-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; }
+.badge-count {
+  background:var(--rose); color:white; font-size:12px; font-weight:700;
+  padding:3px 10px; border-radius:100px;
+}
+
+.ag-card {
+  background:var(--white); border:1px solid var(--border);
+  border-radius:16px; padding:18px; margin-bottom:10px;
+  display:flex; align-items:center; gap:14px;
+  transition:border-color 0.2s;
+}
+.ag-card:hover { border-color:var(--rose-light); }
+.ag-hora {
+  background:var(--rose); color:white;
+  border-radius:10px; padding:8px 12px;
+  font-weight:700; font-size:15px; text-align:center;
+  flex-shrink:0; min-width:58px;
+}
+.ag-info { flex:1; }
+.ag-nome { font-size:16px; font-weight:600; }
+.ag-servico { font-size:13px; color:var(--muted); margin-top:2px; }
+.ag-tel { font-size:12px; color:var(--muted); margin-top:4px; }
+.ag-preco { font-size:16px; font-weight:700; color:var(--brown); flex-shrink:0; }
+.ag-actions { display:flex; gap:8px; }
+.btn-wpp {
+  width:36px; height:36px; background:#25D366; color:white;
+  border:none; border-radius:10px; cursor:pointer; font-size:16px;
+  display:flex; align-items:center; justify-content:center;
+  transition:background 0.2s;
+}
+.btn-wpp:hover { background:#1ebe5d; }
+.btn-cancel {
+  width:36px; height:36px; background:var(--nude);
+  border:1px solid var(--border); color:var(--muted);
+  border-radius:10px; cursor:pointer; font-size:16px;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s;
+}
+.btn-cancel:hover { background:#fee2e2; border-color:#fca5a5; color:#dc2626; }
+
+.empty {
+  text-align:center; padding:48px 20px;
+  color:var(--muted); font-size:15px; line-height:1.7;
+}
+.empty-icon { font-size:40px; margin-bottom:12px; }
+
+.loading { text-align:center; padding:40px; color:var(--muted); }
+
+/* TOTAL DO DIA */
+.total-bar {
+  background:var(--nude); border:1px solid var(--border);
+  border-radius:14px; padding:16px 20px; margin-top:16px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.total-bar .t-label { font-size:14px; color:var(--brown-mid); font-weight:500; }
+.total-bar .t-val { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:700; color:var(--green); }
+</style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div class="tela-login" id="tela-login">
+  <div class="login-card">
+    <div class="login-icon" ><img src="images/logoLf.png"  height="75" border_radius="15px"></div>
+    <div class="login-title">Painel da Le</div>
+    <div class="login-sub">Digite a senha para acessar</div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input type="password" id="input-senha" placeholder="••••••••">
+    </div>
+    <button class="btn-entrar" onclick="entrar()">Entrar</button>
+    <div class="erro-senha" id="erro-senha">Senha incorreta. Tente novamente.</div>
+  </div>
+</div>
+
+<!-- TELA DO PAINEL -->
+<div id="tela-painel" style="display:none">
+
+<div class="header">
+  <div class="logo">Meus <span>agendamentos</span> </div>
+  <div class="header-right">
+    <div class="header-tag">Painel da Le</div>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- DATA NAV -->
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="mudarDia(-1)">‹</button>
+    <div class="date-label" id="date-label">—</div>
+    <input type="date" class="date-input" id="date-input" onchange="irParaData(this.value)">
+    <button class="date-nav-btn" onclick="mudarDia(1)">›</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card highlight">
+      <div class="stat-num" id="stat-total">—</div>
+      <div class="stat-label">Agendamentos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-faturamento">—</div>
+      <div class="stat-label">Faturamento</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-prox">—</div>
+      <div class="stat-label">Próximo</div>
+    </div>
+  </div>
+
+  <!-- LISTA -->
+  <div class="list-header">
+    <div class="list-title">Agenda do dia</div>
+    <div class="badge-count" id="badge-count">0</div>
+  </div>
+  <div id="lista">
+    <div class="loading">Carregando...</div>
+  </div>
+
+</div>
+</div><!-- /tela-painel -->
+
+<script>
+// ── SENHA ─────────────────────────────────────────────
+// Troque 'nail1234' pela senha que quiser usar
+const SENHA = 'le1234'
+
+function verificarSenha() {
+  sessionStorage.getItem('painel_auth') === SENHA ? mostrarPainel() : mostrarLogin()
+}
+function mostrarLogin() {
+  document.getElementById('tela-login').style.display = 'flex'
+  document.getElementById('tela-painel').style.display = 'none'
+}
+function mostrarPainel() {
+  document.getElementById('tela-login').style.display = 'none'
+  document.getElementById('tela-painel').style.display = 'block'
+  carregar()
+}
+function entrar() {
+  const digitada = document.getElementById('input-senha').value
+  if (digitada === SENHA) {
+    sessionStorage.setItem('painel_auth', SENHA)
+    document.getElementById('erro-senha').style.display = 'none'
+    mostrarPainel()
+  } else {
+    document.getElementById('erro-senha').style.display = 'block'
+    document.getElementById('input-senha').value = ''
+    document.getElementById('input-senha').focus()
+  }
+}
+function sair() {
+  sessionStorage.removeItem('painel_auth')
+  mostrarLogin()
+}
+document.getElementById('input-senha').addEventListener('keydown', e => {
+  if (e.key === 'Enter') entrar()
+})
+
+// ── PAINEL ────────────────────────────────────────────
+let dataAtual = new Date()
+dataAtual.setHours(0,0,0,0)
+
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+               'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+
+function toApiDate(d) {
+  return d.toISOString().split('T')[0]
+}
+
+function toLabelDate(d) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0)
+  const amanha = new Date(hoje); amanha.setDate(hoje.getDate()+1)
+  if(d.getTime()===hoje.getTime()) return 'Hoje, '+d.getDate()+' de '+MESES[d.getMonth()]
+  if(d.getTime()===amanha.getTime()) return 'Amanhã, '+d.getDate()+' de '+MESES[d.getMonth()]
+  return d.getDate()+' de '+MESES[d.getMonth()]+' de '+d.getFullYear()
+}
+
+function mudarDia(dir) {
+  dataAtual.setDate(dataAtual.getDate() + dir)
+  carregar()
+}
+
+function irParaData(val) {
+  dataAtual = new Date(val + 'T00:00:00')
+  carregar()
+}
+
+async function carregar() {
+  document.getElementById('date-label').textContent = toLabelDate(dataAtual)
+  document.getElementById('date-input').value = toApiDate(dataAtual)
+  document.getElementById('lista').innerHTML = '<div class="loading">Carregando...</div>'
+
+  try {
+    const res = await fetch(`/api/painel/dia/${toApiDate(dataAtual)}`)
+    const { agendamentos } = await res.json()
+    renderizar(agendamentos)
+  } catch(e) {
+    document.getElementById('lista').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div>Erro ao carregar. Verifique a conexão.</div>'
+  }
+}
+
+function renderizar(ags) {
+  document.getElementById('stat-total').textContent = ags.length
+  document.getElementById('badge-count').textContent = ags.length
+
+  // Faturamento
+  const fat = ags.reduce((acc, ag) => {
+    const n = parseFloat((ag.preco || '').replace(/[^0-9.]/g,'')) || 0
+    return acc + n
+  }, 0)
+  document.getElementById('stat-faturamento').textContent = fat > 0 ? 'R$'+fat : '—'
+
+  // Próximo horário
+  const agora = new Date()
+  const prox = ags.find(ag => {
+    const [h,m] = ag.hora.split(':')
+    const t = new Date(dataAtual)
+    t.setHours(parseInt(h), parseInt(m))
+    return t > agora
+  })
+  document.getElementById('stat-prox').textContent = prox ? prox.hora : '—'
+
+  const lista = document.getElementById('lista')
+  if(ags.length === 0) {
+    lista.innerHTML = '<div class="empty"><div class="empty-icon"></div>Nenhum agendamento para este dia.</div>'
+    return
+  }
+
+  lista.innerHTML = ags.map(ag => `
+    <div class="ag-card" id="ag-${ag.id}">
+      <div class="ag-hora">${ag.hora}</div>
+      <div class="ag-info">
+        <div class="ag-nome">${ag.nome}</div>
+        <div class="ag-servico">${ag.servico} · ${ag.duracao || ''}</div>
+        <div class="ag-tel">📱 ${ag.telefone}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+        <div class="ag-preco">${ag.preco || ''}</div>
+        <div class="ag-actions">
+          <button class="btn-wpp" title="Mandar mensagem" onclick="wpp('${ag.telefone}','${ag.nome}','${ag.hora}')">💬</button>
+          <button class="btn-cancel" title="Cancelar" onclick="cancelar(${ag.id})">✕</button>
+        </div>
+      </div>
+    </div>
+  `).join('')
+
+  // Total
+  if(fat > 0) {
+    lista.innerHTML += `
+      <div class="total-bar">
+        <div class="t-label"> Total do dia</div>
+        <div class="t-val">R$ ${fat.toFixed(0)}</div>
+      </div>`
+  }
+}
+
+function wpp(tel, nome, hora) {
+  const num = tel.replace(/\D/g,'')
+  const msg = encodeURIComponent(`Olá ${nome}! Confirmando seu horário às ${hora}. Te esperamos! `)
+  window.open(`https://wa.me/55${num}?text=${msg}`, '_blank')
+}
+
+async function cancelar(id) {
+  if(!confirm('Cancelar este agendamento?')) return
+  await fetch(`/api/agendar/${id}`, { method:'DELETE' })
+  document.getElementById('ag-'+id)?.remove()
+  carregar()
+}
+
+verificarSenha()
+</script>
+</body>
+</html>

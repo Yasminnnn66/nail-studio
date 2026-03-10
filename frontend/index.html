@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nail Studio — Agendamento</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose: #D4847A;
+  --rose-light: #f7ebe8;
+  --rose-dark: #b5655b;
+  --cream: #FDFAF8;
+  --nude: #F5EDE8;
+  --brown: #2C1F1A;
+  --brown-mid: #7A5C4E;
+  --muted: #B09890;
+  --green: #5A9E7C;
+  --border: #EAD9D3;
+  --white: #FFFFFF;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--brown);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* HEADER */
+.header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.logo img {
+  height: 38px; width: auto; object-fit: contain;
+}
+/* Fallback se não tiver logo */
+.logo-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--brown); letter-spacing: -0.3px;
+}
+.logo-text span { color: var(--rose); }
+
+/* PROGRESS BAR */
+.progress-wrap {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px 0;
+  position: sticky; top: 63px; z-index: 49;
+}
+.steps-track {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 480px; margin: 0 auto;
+  position: relative; padding-bottom: 14px;
+}
+.steps-track::before {
+  content: ''; position: absolute;
+  top: 14px; left: 14px; right: 14px;
+  height: 2px; background: var(--border); z-index: 0;
+}
+.steps-fill {
+  position: absolute; top: 14px; left: 14px;
+  height: 2px; background: var(--rose); z-index: 1;
+  transition: width 0.5s cubic-bezier(.4,0,.2,1); width: 0%;
+}
+.step-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--white); border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  position: relative; z-index: 2; transition: all 0.3s; flex-shrink: 0;
+}
+.step-dot.active { border-color: var(--rose); background: var(--rose); color: white; box-shadow: 0 0 0 4px rgba(212,132,122,0.15); }
+.step-dot.done { border-color: var(--rose); background: var(--rose); color: white; }
+.step-dot.done::after { content: '✓'; font-size: 13px; }
+.step-dot.done .dot-num { display: none; }
+
+/* PAGES */
+.pages { flex: 1; }
+.page { display: none; min-height: calc(100vh - 116px); flex-direction: column; }
+.page.active { display: flex; animation: fadeUp 0.3s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+.page-inner {
+  flex: 1; max-width: 480px; width: 100%;
+  margin: 0 auto; padding: 32px 20px 100px;
+}
+.page-header { margin-bottom: 28px; }
+.page-tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--rose); margin-bottom: 8px; }
+.page-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 700; line-height: 1.1; color: var(--brown); }
+.page-sub { font-size: 14px; color: var(--muted); margin-top: 6px; }
+
+/* BOTTOM BAR */
+.bottom-bar-wrap {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: var(--white); border-top: 1px solid var(--border);
+}
+.bottom-bar-inner { max-width: 480px; margin: 0 auto; padding: 14px 20px; display: flex; gap: 10px; }
+.btn { flex: 1; padding: 15px; border-radius: 14px; border: none; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: var(--rose); color: white; }
+.btn-primary:hover { background: var(--rose-dark); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { background: var(--border); color: var(--muted); cursor: default; transform: none; }
+.btn-secondary { background: var(--nude); color: var(--brown-mid); flex: 0 0 auto; padding: 15px 20px; }
+.btn-secondary:hover { background: var(--border); }
+
+/* ── STEP 1: SERVIÇOS ── */
+.services-list { display: flex; flex-direction: column; gap: 12px; }
+.service-item {
+  background: var(--white); border: 2px solid var(--border);
+  border-radius: 16px; padding: 16px; cursor: pointer;
+  display: flex; align-items: center; gap: 14px;
+  transition: all 0.2s; user-select: none;
+}
+.service-item:hover { border-color: var(--rose-light); background: var(--rose-light); }
+.service-item.selected { border-color: var(--rose); background: var(--rose-light); box-shadow: 0 4px 20px rgba(212,132,122,0.15); }
+.service-img {
+  width: 56px; height: 56px; border-radius: 12px;
+  overflow: hidden; flex-shrink: 0;
+  background: var(--nude);
+  display: flex; align-items: center; justify-content: center;
+}
+.service-img img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 12px;
+}
+/* placeholder se não tiver imagem */
+.service-img .placeholder {
+  font-size: 26px; line-height: 1;
+}
+.service-item.selected .service-img { background: rgba(212,132,122,0.2); }
+.service-info { flex: 1; }
+.service-name { font-size: 16px; font-weight: 600; }
+.service-desc { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.service-meta { text-align: right; flex-shrink: 0; }
+.service-price { font-size: 17px; font-weight: 700; color: var(--brown); }
+.service-time { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.service-check { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); margin-left: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.service-item.selected .service-check { background: var(--rose); border-color: var(--rose); color: white; font-size: 12px; }
+.service-item.selected .service-check::after { content: '✓'; }
+
+/* ── STEP 2: DATA ── */
+.month-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.month-label { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; }
+.month-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--nude); border: none; cursor: pointer; font-size: 16px; color: var(--brown-mid); display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.month-btn:hover { background: var(--border); }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; }
+.cal-day-label { text-align: center; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; padding: 6px 0; letter-spacing: 0.5px; }
+.cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 2px solid transparent; }
+.cal-day:hover:not(.empty):not(.past) { background: var(--rose-light); border-color: var(--rose-light); }
+.cal-day.empty { cursor: default; }
+.cal-day.past { color: var(--border); cursor: default; }
+.cal-day.selected { background: var(--rose); color: white; border-color: var(--rose); box-shadow: 0 4px 14px rgba(212,132,122,0.3); }
+.cal-day.today:not(.selected) { border-color: var(--rose); color: var(--rose); font-weight: 700; }
+
+/* ── STEP 3: HORÁRIO ── */
+.time-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.time-item { background: var(--white); border: 2px solid var(--border); border-radius: 12px; padding: 14px 8px; text-align: center; cursor: pointer; transition: all 0.15s; }
+.time-item:hover:not(.busy) { border-color: var(--rose-light); background: var(--rose-light); }
+.time-item.selected { border-color: var(--rose); background: var(--rose-light); box-shadow: 0 4px 14px rgba(212,132,122,0.15); }
+.time-item.busy { background: var(--nude); cursor: default; opacity: 0.5; }
+.time-hour { font-size: 16px; font-weight: 600; }
+.time-item.busy .time-hour { color: var(--muted); }
+.time-item.selected .time-hour { color: var(--rose-dark); }
+.time-status { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.time-item.selected .time-status { color: var(--rose); }
+.date-selected-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--rose-light); border: 1px solid var(--rose); color: var(--rose-dark); font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: 100px; margin-bottom: 20px; }
+
+/* ── STEP 4: DADOS ── */
+.form { display: flex; flex-direction: column; gap: 16px; }
+.field label { display: block; font-size: 12px; font-weight: 600; color: var(--brown-mid); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+.field input, .field textarea { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--brown); background: var(--white); outline: none; transition: border-color 0.2s; }
+.field input:focus, .field textarea:focus { border-color: var(--rose); }
+.field input::placeholder { color: var(--muted); }
+.field textarea { resize: none; height: 90px; }
+.summary-card { background: var(--rose-light); border: 1px solid rgba(212,132,122,0.3); border-radius: 16px; padding: 18px; margin-bottom: 8px; }
+.summary-card h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--rose-dark); margin-bottom: 12px; }
+.summary-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(212,132,122,0.2); font-size: 14px; }
+.summary-row:last-child { border-bottom: none; padding-bottom: 0; }
+.summary-row .sr-label { color: var(--brown-mid); }
+.summary-row .sr-val { font-weight: 600; color: var(--brown); }
+
+/* ── STEP 5: CONFIRMAÇÃO ── */
+.confirm-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; max-width: 480px; margin: 0 auto; width: 100%; }
+.confirm-icon { width: 90px; height: 90px; background: var(--rose-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 42px; margin-bottom: 24px; animation: popIn 0.5s cubic-bezier(.175,.885,.32,1.275); }
+@keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.confirm-title { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 700; color: var(--brown); margin-bottom: 8px; line-height: 1.1; }
+.confirm-sub { font-size: 15px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+.confirm-card { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: 22px; width: 100%; margin-bottom: 20px; text-align: left; }
+.confirm-card-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.confirm-card-row:last-child { border-bottom: none; padding-bottom: 0; }
+.ccr-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--nude); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.ccr-label { font-size: 11px; color: var(--muted); }
+.ccr-val { font-size: 14px; font-weight: 600; color: var(--brown); }
+.btn-wpp { width: 100%; padding: 16px; background: #25D366; color: white; border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 10px; transition: background 0.2s; }
+.btn-wpp:hover { background: #1ebe5d; }
+.btn-novo { width: 100%; padding: 14px; background: var(--nude); color: var(--brown-mid); border: none; border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
+.btn-novo:hover { background: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    
+  
+      <img src="images/logoLf.png" alt="Nail Studio">
+
+    <div class="logo-text">Leticia Nail <span>Studio</span></div>
+  </div>
+  <div style="font-size:13px;color:var(--muted);" id="step-label">Passo 1 de 4</div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="steps-track">
+    <div class="steps-fill" id="steps-fill"></div>
+    <div class="step-dot active" id="dot-1"><span class="dot-num">1</span></div>
+    <div class="step-dot" id="dot-2"><span class="dot-num">2</span></div>
+    <div class="step-dot" id="dot-3"><span class="dot-num">3</span></div>
+    <div class="step-dot" id="dot-4"><span class="dot-num">4</span></div>
+    <div class="step-dot" id="dot-5"><span class="dot-num">✓</span></div>
+  </div>
+</div>
+
+<div class="pages">
+
+<!-- PAGE 1: SERVIÇO -->
+<div class="page active" id="page-1">
+  <div class="page-inner">
+    <div class="page-header">
+      <div class="page-tag">Etapa 1</div>
+      <div class="page-title">Qual serviço<br>você deseja?</div>
+      <div class="page-sub">Escolha um serviço para continuar</div>
+    </div>
+    <div class="services-list">
+
+
+      <div class="service-item" onclick="selectService(this,'Manicure','R$ 35','45 min')">
+        <div class="service-img">
+          <img src="images/esmalt.png" alt="Manicure" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <span class="placeholder" style="display:none"></span>
+        </div>
+        <div class="service-info">
+          <div class="service-name">Manicure</div>
+          <div class="service-desc">Cutilagem + esmaltação</div>
+        </div>
+        <div class="service-meta">
+          <div class="service-price">R$ 35</div>
+          <div class="service-time">45 min</div>
+        </div>
+        <div class="service-check"></div>
+      </div>
+
+      <div class="service-item" onclick="selectService(this,'Pedicure','R$ 45','60 min')">
+        <div class="service-img">
+          <img src="images/pedi.jpg" alt="Pedicure" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <span class="placeholder" style="display:none"></span>
+        </div>
+        <div class="service-info">
+          <div class="service-name">Pedicure</div>
+          <div class="service-desc">Cuidado completo dos pés</div>
+        </div>
+        <div class="service-meta">
+          <div class="service-price">R$ 45</div>
+          <div class="service-time">60 min</div>
+        </div>
+        <div class="service-check"></div>
+      </div>
+
+      <div class="service-item" onclick="selectService(this,'Mani + Pedi','R$ 75','100 min')">
+        <div class="service-img">
+          <img src="images/cuti.png" alt="Mani + Pedi" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <span class="placeholder" style="display:none">✨</span>
+        </div>
+        <div class="service-info">
+          <div class="service-name">Mani + Pedi</div>
+          <div class="service-desc">Combo completo com desconto</div>
+        </div>
+        <div class="service-meta">
+          <div class="service-price">R$ 75</div>
+          <div class="service-time">100 min</div>
+        </div>
+        <div class="service-check"></div>
+      </div>
+
+      <div class="service-item" onclick="selectService(this,'Gel/Acrílico','R$ 120','120 min')">
+        <div class="service-img">
+          <img src="images/gel.png" alt="Gel/Acrílico" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <span class="placeholder" style="display:none"></span>
+        </div>
+        <div class="service-info">
+          <div class="service-name">Gel / Acrílico</div>
+          <div class="service-desc">Alongamento ou manutenção</div>
+        </div>
+        <div class="service-meta">
+          <div class="service-price">R$ 120</div>
+          <div class="service-time">120 min</div>
+        </div>
+        <div class="service-check"></div>
+      </div>
+
+      <div class="service-item" onclick="selectService(this,'Nail Art','R$ 60','75 min')">
+        <div class="service-img">
+          <img src="images/nailDesigner.png" alt="Nail Art" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+          <span class="placeholder" style="display:none"></span>
+        </div>
+        <div class="service-info">
+          <div class="service-name">Nail Art</div>
+          <div class="service-desc">Decoração personalizada</div>
+        </div>
+        <div class="service-meta">
+          <div class="service-price">R$ 60</div>
+          <div class="service-time">75 min</div>
+        </div>
+        <div class="service-check"></div>
+      </div>
+
+    </div>
+  </div>
+  <div class="bottom-bar-wrap">
+    <div class="bottom-bar-inner">
+      <button class="btn btn-primary" id="btn1" onclick="goTo(2)" disabled>Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: DATA -->
+<div class="page" id="page-2">
+  <div class="page-inner">
+    <div class="page-header">
+      <div class="page-tag">Etapa 2</div>
+      <div class="page-title">Quando você<br>quer vir?</div>
+      <div class="page-sub">Escolha uma data disponível</div>
+    </div>
+    <div class="month-nav">
+      <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+      <div class="month-label" id="month-label"></div>
+      <button class="month-btn" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+  <div class="bottom-bar-wrap">
+    <div class="bottom-bar-inner">
+      <button class="btn btn-secondary" onclick="goTo(1)">← Voltar</button>
+      <button class="btn btn-primary" id="btn2" onclick="goTo(3)" disabled>Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: HORÁRIO -->
+<div class="page" id="page-3">
+  <div class="page-inner">
+    <div class="page-header">
+      <div class="page-tag">Etapa 3</div>
+      <div class="page-title">Qual horário<br>prefere?</div>
+    </div>
+    <div class="date-selected-pill" id="date-pill"> —</div>
+    <div class="time-grid" id="time-grid"></div>
+  </div>
+  <div class="bottom-bar-wrap">
+    <div class="bottom-bar-inner">
+      <button class="btn btn-secondary" onclick="goTo(2)">← Voltar</button>
+      <button class="btn btn-primary" id="btn3" onclick="goTo(4)" disabled>Continuar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 4: DADOS -->
+<div class="page" id="page-4">
+  <div class="page-inner">
+    <div class="page-header">
+      <div class="page-tag">Etapa 4</div>
+      <div class="page-title">Seus dados</div>
+      <div class="page-sub">Para confirmarmos o agendamento</div>
+    </div>
+    <div class="summary-card" id="summary-card"></div>
+    <div class="form">
+      <div class="field">
+        <label>Nome completo</label>
+        <input type="text" id="f-nome" placeholder="Ex: Maria Silva" oninput="checkForm()">
+      </div>
+      <div class="field">
+        <label>WhatsApp</label>
+        <input type="tel" id="f-tel" placeholder="(41) 99999-9999" oninput="maskTel(this); checkForm()">
+      </div>
+      <div class="field">
+        <label>Observação <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+        <textarea id="f-obs" placeholder="Alguma preferência de cor, alergia..."></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-bar-wrap">
+    <div class="bottom-bar-inner">
+      <button class="btn btn-secondary" onclick="goTo(3)">← Voltar</button>
+      <button class="btn btn-primary" id="btn4" onclick="confirmar()" disabled>Confirmar ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: CONFIRMAÇÃO -->
+<div class="page" id="page-5">
+  <div class="confirm-wrap">
+    <div class="confirm-icon">🎉</div>
+    <div class="confirm-title">Agendado<br>com sucesso!</div>
+    <div class="confirm-sub">Até breve, <strong id="confirm-nome"></strong>!<br>Te esperamos no horário marcado.</div>
+    <div class="confirm-card" id="confirm-card"></div>
+<button class="btn-wpp" onclick="abrirWpp()"><span></span> Enviar confirmação pelo WhatsApp</button>
+    <button class="btn-novo" onclick="novoAgendamento()">Fazer novo agendamento</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const state = {
+  servico: null, preco: null, duracao: null,
+  data: null, dataFmt: null, hora: null,
+  nome: null, tel: null, obs: null
+}
+
+function goTo(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+  document.getElementById('page-'+n).classList.add('active')
+  window.scrollTo(0,0)
+  updateProgress(n)
+  if (n===3) renderTimes()
+  if (n===4) renderSummary()
+}
+
+function updateProgress(n) {
+  const labels = ['','Passo 1 de 4','Passo 2 de 4','Passo 3 de 4','Passo 4 de 4','Concluído!']
+  document.getElementById('step-label').textContent = labels[n]
+  for (let i=1; i<=5; i++) {
+    const dot = document.getElementById('dot-'+i)
+    dot.classList.remove('active','done')
+    if (i < n) dot.classList.add('done')
+    else if (i === n) dot.classList.add('active')
+  }
+  const fills = [0,0,25,50,75,100]
+  document.getElementById('steps-fill').style.width = fills[n]+'%'
+}
+
+function selectService(el, nome, preco, duracao) {
+  document.querySelectorAll('.service-item').forEach(i => i.classList.remove('selected'))
+  el.classList.add('selected')
+  state.servico = nome; state.preco = preco; state.duracao = duracao
+  document.getElementById('btn1').disabled = false
+}
+
+// ── CALENDÁRIO ──
+let calDate = new Date(); calDate.setDate(1)
+const DIAS  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+
+function renderCal() {
+  document.getElementById('month-label').textContent = MESES[calDate.getMonth()] + ' ' + calDate.getFullYear()
+  const grid = document.getElementById('cal-grid')
+  grid.innerHTML = ''
+  DIAS.forEach(d => {
+    const el = document.createElement('div')
+    el.className = 'cal-day-label'; el.textContent = d; grid.appendChild(el)
+  })
+  const firstDay = new Date(calDate.getFullYear(), calDate.getMonth(), 1).getDay()
+  for (let i=0; i<firstDay; i++) {
+    const el = document.createElement('div'); el.className = 'cal-day empty'; grid.appendChild(el)
+  }
+  const daysInMonth = new Date(calDate.getFullYear(), calDate.getMonth()+1, 0).getDate()
+  const today = new Date(); today.setHours(0,0,0,0)
+  for (let d=1; d<=daysInMonth; d++) {
+    const el = document.createElement('div')
+    const thisDate = new Date(calDate.getFullYear(), calDate.getMonth(), d)
+    const isPast = thisDate < today
+    const isSun  = thisDate.getDay() === 0
+    el.className = 'cal-day'; el.textContent = d
+    if (isPast || isSun) { el.classList.add('past') }
+    else {
+      el.classList.add('available')
+      if (thisDate.toDateString() === today.toDateString()) el.classList.add('today')
+      el.onclick = () => selectDay(el, d, thisDate)
+    }
+    grid.appendChild(el)
+  }
+  if (state.data) {
+    const sel = new Date(state.data)
+    if (sel.getMonth()===calDate.getMonth() && sel.getFullYear()===calDate.getFullYear()) {
+      document.querySelectorAll('.cal-day.available').forEach(el => {
+        if (parseInt(el.textContent)===sel.getDate()) el.classList.add('selected')
+      })
+    }
+  }
+}
+
+function selectDay(el, d, dateObj) {
+  document.querySelectorAll('.cal-day').forEach(c => c.classList.remove('selected'))
+  el.classList.add('selected')
+  state.data = dateObj
+  const dd = String(d).padStart(2,'0')
+  const mm = String(dateObj.getMonth()+1).padStart(2,'0')
+  state.dataFmt = `${dd}/${mm}/${dateObj.getFullYear()}`
+  state.hora = null
+  document.getElementById('btn2').disabled = false
+}
+
+function changeMonth(dir) { calDate.setMonth(calDate.getMonth()+dir); renderCal() }
+renderCal()
+
+// ── HORÁRIOS ──
+async function renderTimes() {
+  const pill = document.getElementById('date-pill')
+  pill.textContent = ' ' + (state.dataFmt || '—')
+  const grid = document.getElementById('time-grid')
+  grid.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0;grid-column:span 3;text-align:center">Carregando horários...</div>'
+  const [dd,mm,yyyy] = state.dataFmt.split('/')
+  const dataApi = `${yyyy}-${mm}-${dd}`
+  try {
+    const res  = await fetch(`/api/horarios/${dataApi}`)
+    const dados = await res.json()
+    grid.innerHTML = ''
+    dados.horarios.forEach(({ hora, disponivel }) => {
+      const el = document.createElement('div')
+      el.className = 'time-item'
+      if (!disponivel) el.classList.add('busy')
+      if (state.hora === hora) el.classList.add('selected')
+      el.innerHTML = `<div class="time-hour">${hora}</div><div class="time-status">${!disponivel ? 'Ocupado' : 'Disponível'}</div>`
+      if (disponivel) el.onclick = () => selectTime(el, hora)
+      grid.appendChild(el)
+    })
+  } catch (err) {
+    grid.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0;grid-column:span 3;text-align:center">Erro ao carregar horários. Tente novamente.</div>'
+  }
+}
+
+function selectTime(el, t) {
+  document.querySelectorAll('.time-item').forEach(i => i.classList.remove('selected'))
+  el.classList.add('selected')
+  el.querySelector('.time-status').textContent = 'Selecionado'
+  state.hora = t
+  document.getElementById('btn3').disabled = false
+}
+
+// ── DADOS ──
+function renderSummary() {
+  document.getElementById('summary-card').innerHTML = `
+    <h4>Resumo do agendamento</h4>
+    <div class="summary-row"><span class="sr-label">Serviço</span><span class="sr-val">${state.servico}</span></div>
+    <div class="summary-row"><span class="sr-label">Data</span><span class="sr-val">${state.dataFmt}</span></div>
+    <div class="summary-row"><span class="sr-label">Horário</span><span class="sr-val">${state.hora}</span></div>
+    <div class="summary-row"><span class="sr-label">Valor</span><span class="sr-val" style="color:var(--rose-dark)">${state.preco}</span></div>
+  `
+}
+
+function maskTel(el) {
+  let v = el.value.replace(/\D/g,'')
+  if (v.length > 11) v = v.slice(0,11)
+  if (v.length > 7) v = '('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7)
+  else if (v.length > 2) v = '('+v.slice(0,2)+') '+v.slice(2)
+  else if (v.length > 0) v = '('+v
+  el.value = v
+}
+
+function checkForm() {
+  const nome = document.getElementById('f-nome').value.trim()
+  const tel  = document.getElementById('f-tel').value.replace(/\D/g,'')
+  document.getElementById('btn4').disabled = !(nome.length >= 3 && tel.length >= 10)
+}
+
+async function confirmar() {
+  state.nome = document.getElementById('f-nome').value.trim()
+  state.tel  = document.getElementById('f-tel').value.trim()
+  state.obs  = document.getElementById('f-obs').value.trim()
+  const [dd,mm,yyyy] = state.dataFmt.split('/')
+  const dataApi = `${yyyy}-${mm}-${dd}`
+  try {
+    const res = await fetch('/api/agendar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: state.nome, telefone: state.tel,
+        servico: state.servico, preco: state.preco,
+        duracao: state.duracao, data: dataApi,
+        hora: state.hora, obs: state.obs
+      })
+    })
+    const dados = await res.json()
+    if (!res.ok) { alert(dados.erro || 'Erro ao agendar. Tente novamente.'); return }
+  } catch (err) {
+    alert('Erro de conexão. Verifique sua internet.'); return
+  }
+  document.getElementById('confirm-nome').textContent = state.nome.split(' ')[0]
+  document.getElementById('confirm-card').innerHTML = `
+    <div class="confirm-card-row"><div class="ccr-icon"></div><div><div class="ccr-label">Serviço</div><div class="ccr-val">${state.servico}</div></div></div>
+    <div class="confirm-card-row"><div class="ccr-icon"></div><div><div class="ccr-label">Data</div><div class="ccr-val">${state.dataFmt}</div></div></div>
+    <div class="confirm-card-row"><div class="ccr-icon"></div><div><div class="ccr-label">Horário</div><div class="ccr-val">${state.hora}</div></div></div>
+    <div class="confirm-card-row"><div class="ccr-icon"></div><div><div class="ccr-label">Valor</div><div class="ccr-val">${state.preco} · ${state.duracao}</div></div></div>
+    <div class="confirm-card-row"><div class="ccr-icon"></div><div><div class="ccr-label">WhatsApp</div><div class="ccr-val">${state.tel}</div></div></div>
+  `
+  goTo(5)
+}
+
+function abrirWpp() {
+  //  COLOQUE O NÚMERO DA MANICURE AQUI (só números, com DDD)
+  const numeroManicure = '41987903477'
+
+  const msg = encodeURIComponent(
+    `Olá ${state.nome}! \n\n` +
+    `Seu agendamento foi confirmado:\n\n` +
+    ` Serviço: ${state.servico}\n` +
+    ` Data: ${state.dataFmt}\n` +
+    ` Horário: ${state.hora}\n` +
+    ` Valor: ${state.preco}\n\n` +
+    `Te esperamos! Qualquer dúvida é só responder aqui. `
+  )
+
+  window.open(`https://wa.me/${state.tel.replace(/\D/g,'')}?text=${msg}`, '_blank')
+}
+
+function novoAgendamento() {
+  Object.keys(state).forEach(k => state[k] = null)
+  document.querySelectorAll('.service-item').forEach(i => i.classList.remove('selected'))
+  document.getElementById('btn1').disabled = true
+  document.getElementById('f-nome').value = ''
+  document.getElementById('f-tel').value  = ''
+  document.getElementById('f-obs').value  = ''
+  renderCal(); goTo(1)
+}
+</script>
+</body>
+</html>
