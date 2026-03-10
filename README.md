@@ -1,6 +1,6 @@
-# 💅 Nail Studio — Sistema de Agendamento
+# Nail Studio — Sistema de Agendamento
 
-## 🚀 Como rodar
+## Como rodar
 
 ```bash
 npm install
@@ -12,7 +12,7 @@ Painel: http://localhost:3000/painel
 
 ---
 
-## 🖼️ Como adicionar imagens
+## Como adicionar imagens
 
 Coloque as imagens dos serviços na pasta `frontend/images/` com estes nomes:
 
@@ -34,7 +34,7 @@ Para usar a logo no cabeçalho, edite `frontend/index.html` e descomente a linha
 
 ---
 
-## 📁 Estrutura
+## Estrutura
 
 ```
 manicure/
@@ -55,8 +55,3 @@ manicure/
 
 ---
 
-## 🌐 Deploy no Railway
-
-1. Suba o projeto no GitHub
-2. Crie conta em [railway.app](https://railway.app)
-3. Conecte o repositório e clique em Deploy
