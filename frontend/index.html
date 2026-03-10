@@ -617,10 +617,10 @@ function abrirWpp() {
 
   const msg = encodeURIComponent(
   `Meu agendamento foi confirmado:\n\n` +
-  `✅ Serviço: ${state.servico}\n` +
-  `📅 Data: ${state.dataFmt}\n` +
-  `🕐 Horário: ${state.hora}\n` +
-  `💰 Valor: ${state.preco}\n\n` 
+  `Serviço: ${state.servico}\n` +
+  `Data: ${state.dataFmt}\n` +
+  `Horário: ${state.hora}\n` +
+  `Valor: ${state.preco}\n\n` 
 )
 
   window.open(`https://wa.me/${state.tel.replace(/\D/g,'')}?text=${msg}`, '_blank')
